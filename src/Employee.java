@@ -7,6 +7,21 @@ public class Employee {
     private int person_id;
     static int id=1;
     private double salary;
+    private int workcode;
+
+    public Employee(String national_code, String name, String last_name, String pass, String email, double salary) {
+        this.person_id = id;
+        this.workcode= id;
+        this.national_code = national_code;
+        this.name = name;
+        this.last_name = last_name;
+        this.pass = pass;
+        this.email = email;
+        this.salary = salary;
+        this.workcode = workcode;
+        id++;
+    }
+
     public String getNational_code() {
         return national_code;
     }
@@ -31,6 +46,13 @@ public class Employee {
         return person_id;
     }
 
+    public double getSalary() {
+        return salary;
+    }
+
+    public int getWorkcode() { return workcode;}
+
+
     public void setNational_code(String national_code) {
         this.national_code = national_code;
     }
@@ -50,4 +72,5 @@ public class Employee {
     public void setEmail(String email) {
         this.email = email;
     }
+
 }

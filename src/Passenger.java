@@ -6,14 +6,16 @@ public class Passenger {
     private String email;
     private int person_id;
     static int id=1;
+    private double bankBalance;
 
-    public Passenger(String national_code, String name, String last_name, String pass, String email, int person_id) {
+    public Passenger(String national_code, String name, String last_name, String pass, String email,double bankBalance) {
         this.person_id =id;
         this.national_code = national_code;
         this.name = name;
         this.last_name = last_name;
         this.pass = pass;
         this.email = email;
+        this.bankBalance=bankBalance;
         id++;
     }
 
@@ -39,6 +41,10 @@ public class Passenger {
 
     public int getPerson_id() {
         return person_id;
+    }
+
+    public double getBankBalance() {
+        return bankBalance;
     }
 
     public void setNational_code(String national_code) {

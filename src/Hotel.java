@@ -1,8 +1,5 @@
 import javax.swing.*;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,14 +8,109 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Hotel {
+    //--------------------------------list--------------------------------------
+    public static List<Manager> managers=new ArrayList<>();
     public static List<Employee> employees = new ArrayList<>();
     public static Queue<Reserve> reserves = new LinkedList<>();
     public static List<Passenger> passengers = new ArrayList<>();
     public static List<Room> rooms = new ArrayList<>();
+    //---------------------------------------------------------------------------
 
+    //----------------------------data write--------------------------------
+    public static void dataWrite() {
+        try {
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3307/hotel",
+                    "root", "zahra1382");
+
+            Statement statement = connection.createStatement();
+
+            statement.execute("USE jdbc");
+
+            String sql = "DELETE FROM employee";
+            statement.executeUpdate(sql);
+
+            sql = "DELETE FROM passenger";
+            statement.executeUpdate(sql);
+
+            sql = "DELETE FROM manager";
+            statement.executeUpdate(sql);
+
+            sql = "DELETE FROM reserves";
+            statement.executeUpdate(sql);
+
+            for(Manager i : managers){
+                String sqlQuery = "INSERT INTO manager VALUES (?, ?, ?, ?, ?, ?)";
+                PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
+                preparedStatement.setInt(1, i.getPerson_id());
+                preparedStatement.setString(2, i.getName());
+                preparedStatement.setString(3, i.getLast_name());
+                preparedStatement.setString(4, i.getNational_code());
+                preparedStatement.setString(5, i.getEmail());
+                preparedStatement.setString(6, i.getPass());
+                preparedStatement.executeUpdate();
+            }
+
+            for (Employee i : employees) {
+
+                String sqlQuery = "INSERT INTO employee VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
+                preparedStatement.setInt(1, i.getPerson_id());
+                preparedStatement.setString(2, i.getName());
+                preparedStatement.setString(3, i.getLast_name());
+                preparedStatement.setString(4, i.getNational_code());
+                preparedStatement.setInt(5, i.getWorkcode());
+                preparedStatement.setString(6, i.getEmail());
+                preparedStatement.setString(7, i.getPass());
+                preparedStatement.setDouble(8, i.getSalary());
+                preparedStatement.executeUpdate();
+            }
+
+            for (Passenger i : passengers) {
+
+                String sqlQuery = "INSERT INTO passenger VALUES (?, ?, ?, ?, ?, ?, ?)";
+                PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
+                preparedStatement.setInt(1, i.getPerson_id());
+                preparedStatement.setString(2, i.getNational_code());
+                preparedStatement.setString(3, i.getName());
+                preparedStatement.setString(4, i.getLast_name());
+                preparedStatement.setString(5, i.getPass());
+                preparedStatement.setString(6, i.getEmail());
+                preparedStatement.setDouble(7, i.getBankBalance());
+                preparedStatement.executeUpdate();
+            }
+
+            for (Reserve i : reserves) {
+                String sqlQuery = "INSERT INTO reserves VALUES (?, ?, ?, ?, ?, ?,?)";
+                PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
+                preparedStatement.executeUpdate();
+            }
+            connection.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+    //------------------for add and remove a person or an object------------------
     public static void addEmployee(Employee employee) {
         employees.add(employee);
     }
+    public static void addReserve(Reserve reserve) {
+        reserves.add(reserve);
+    }
+    public static void addPassenger(Passenger passenger) {
+        passengers.add(passenger);
+    }
+    public static void addRoom(Room room) {
+        rooms.add(room);
+    }
+    public static void removeEmployee(Employee employee) {
+        employees.remove(employee);
+    }
+    public static void removeReserve(Reserve reserve) {
+        reserves.remove(reserve);
+    }
+    public static void removePassenger(Passenger passenger){passengers.remove(passenger);}
+    public static void removeRoom(Room room){rooms.remove(room);}
+    //------------------------------------------------------------------------------------
 
     //--------------------------------sign up method--------------------------------------
     public boolean signup(String name, String lastname, String code, String email, String pass) {
