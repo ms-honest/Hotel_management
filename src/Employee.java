@@ -9,16 +9,15 @@ public class Employee {
     private double salary;
     private int workcode;
 
-    public Employee(String national_code, String name, String last_name, String pass, String email, double salary) {
+    public Employee( String name, String last_name,String national_code,String workcode, String email, String pass, double salary) {
         this.person_id = id;
-        this.workcode= id;
+        this.workcode= Integer.parseInt(id+national_code);
         this.national_code = national_code;
         this.name = name;
         this.last_name = last_name;
         this.pass = pass;
         this.email = email;
         this.salary = salary;
-        this.workcode = workcode;
         id++;
     }
 
@@ -73,4 +72,7 @@ public class Employee {
         this.email = email;
     }
 
+    public void setWorkcode(int workcode) {
+        this.workcode = workcode;
+    }
 }

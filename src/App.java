@@ -12,18 +12,7 @@ import java.util.Vector;
 
 public class App {
     public static Hotel hotel=new Hotel();
-    private static final String username="root";
-    private static final String password="zahra1382";
-    private static final String dataconn="jdbc:mysql://localhost:3307/hotel";
-    static Connection sqlcon=null;
-    static PreparedStatement pst=null;
-    static ResultSet result=null;
-    static int q;
-    static int i;
-    int id;
-    int deletitem;
-    public static JTable table=new JTable(0,0);
-    public static void main(String[] args) throws ClassNotFoundException {
+    public static void main(String[] args){
         if(connection()==true)
         {
             start();
@@ -35,63 +24,37 @@ public class App {
     {
         try {
             Connection connection=DriverManager.getConnection("jdbc:mysql://localhost:3307/hotel","root","zahra1382");
-            Statement statement=connection.createStatement();
             return true;
         }catch (SQLException e){
             return false;
         }
     }
-
-    public static void updateDb()
-    {
-
-        try {
-            sqlcon=DriverManager.getConnection(username,password,dataconn);
-            pst=sqlcon.prepareStatement("select * from hotel");
-            result=pst.executeQuery();
-            ResultSetMetaData stdata=result.getMetaData();
-            q=stdata.getColumnCount();
-            DefaultTableModel recordtable=(DefaultTableModel)table.getModel();
-            recordtable.setRowCount(0);
-            while (result.next()){
-                Vector columndata=new Vector();
-                for(i=1 ; i<=q ; i++)
-                {
-                    columndata.add(result.getShort("idemployee"));
-                    columndata.add(result.getShort("name"));
-                    columndata.add(result.getShort("lastname"));
-                    columndata.add(result.getShort("nationalcode"));
-                    columndata.add(result.getShort("workcode"));
-                    columndata.add(result.getShort("email"));
-                    columndata.add(result.getShort("pass"));
-                    columndata.add(result.getShort("salary"));
-                }
-                recordtable.addRow(columndata);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
-    }
     public static void start()
     {
         JFrame f1=new JFrame("menu");
-        ImageIcon icon = new ImageIcon("C:\\Users\\saraye tel\\Hotel_management\\pic\\logo.png");
+        ImageIcon icon = new ImageIcon("C:\\Users\\saraye tel\\Desktop\\hotel_managementservice\\Hotel_management\\pic\\full4.jpg");
         JLabel l0=new JLabel(icon);
-        l0.setBounds(370,0,250,250);
+        l0.setBounds(90,0,820,794);
         f1.add(l0);
+        JButton button=new JButton(new ImageIcon("C:\\Users\\saraye tel\\Desktop\\hotel_managementservice\\Hotel_management\\pic\\train.png"));
+        button.setBounds(95,530,100,120);
+        l0.add(button);
+        JButton button2=new JButton(new ImageIcon("C:\\Users\\saraye tel\\Desktop\\hotel_managementservice\\Hotel_management\\pic\\food.png"));
+        button2.setBounds(370,540,98,110);
+        l0.add(button2);
         f1.setResizable(false);
-        f1.getContentPane().setBackground(Color.white);
-        f1.setSize(1000,1000);
+        f1.getContentPane().setBackground(new Color(255, 255 ,207));
+        f1.setSize(1012,1000);
         f1.setLayout(null);
         f1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f1.setLocationRelativeTo(null);
-        JButton b1=new JButton("sign");
+        JButton b1=new JButton("sign up");
+        b1.setFocusPainted(false);
         b1.setFont(new Font("Serif", Font.BOLD, 40));
-        b1.setBounds(450,350,150,50);
-        b1.setBackground(Color.black);
-        b1.setBorder(new LineBorder(Color.black));
-        f1.add(b1);
+        b1.setBounds(0,180,200,50);
+        b1.setBackground(new Color(255, 255 ,207));
+        b1.setBorder(new LineBorder(new Color(255, 255 ,207)));
+        l0.add(b1);
         b1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 f1.setVisible(false);
@@ -100,10 +63,10 @@ public class App {
         });
         JButton b2=new JButton("log in");
         b2.setFont(new Font("Serif", Font.BOLD, 40));
-        b2.setBounds(450,450,150,50);
-        b2.setBackground(Color.black);
-        b2.setBorder(new LineBorder(Color.black));
-        f1.add(b2);
+        b2.setBounds(0,270,200,50);
+        b2.setBackground(new Color(255, 255 ,207));
+        b2.setBorder(new LineBorder(new Color(255, 255 ,207)));
+        l0.add(b2);
         b2.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 f1.setVisible(false);
@@ -182,16 +145,40 @@ public class App {
         p.setSize(250, 20);
         p.setLocation(370, 420);
         f2.add(p);
+        JLabel bankBalance = new JLabel("Bank");
+        bankBalance.setFont(new Font("Arial", Font.PLAIN, 20));
+        bankBalance.setForeground(Color.pink);
+        bankBalance.setSize(100, 20);
+        bankBalance.setLocation(230, 470);
+        f2.add(bankBalance);
+        JTextField b = new JTextField();
+        b.setFont(new Font("Arial", Font.PLAIN, 20));
+        b.setSize(250, 20);
+        b.setLocation(370, 470);
+        f2.add(b);
         JButton sub = new JButton("Submit");
         sub.setBorder(new LineBorder(Color.white));
         sub.setFont(new Font("Arial", Font.PLAIN, 15));
         sub.setSize(100, 20);
-        sub.setLocation(440, 470);
+        sub.setLocation(440, 520);
         f2.add(sub);
         sub.addActionListener(e -> {
             if(hotel.signup(nam.getText(),lnam.getText(),code.getText(),em.getText(),p.getText())==true)
             {
-                JOptionPane.showMessageDialog(f2,"good");
+                try {
+                    if(hotel.similar(code.getText(),email.getText())==false){
+                        JOptionPane.showMessageDialog(f2,"you have already registered");
+                    }else{
+                        double bb=Double.parseDouble(b.getText());
+                        Passenger passenger=new Passenger(code.getText(),nam.getText(),lnam.getText(),pass.getText(), em.getText(),bb);
+                        Hotel.passengers.add(passenger);
+                        Hotel.passengerWrite(passenger);
+                        userpagee(passenger);
+                        f2.setVisible(false);
+                    }
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
             }else{
                 JOptionPane.showMessageDialog(f2,"try again");
             }
@@ -260,10 +247,45 @@ public class App {
         sub.setLocation(460, 520);
         f3.add(sub);
         sub.addActionListener(e -> {
-            if(h.log(em.getText(),p.getText())==true)
+            if(!em.getText().equals("") && !p.getText().equals(""))
             {
-                admintable();
-                f3.setVisible(false);
+                String ep=em.getText();
+                String pp=p.getText();
+                if(manager.isSelected())
+                {
+                    admintable();
+                    f3.setVisible(false);
+
+                }else if(employee.isSelected())
+                {
+                    try {
+                        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3307/hotel","root","zahra1382");
+                        try {
+                            Statement statement=connection.createStatement();
+                            String emailEmployee="SELECT * FROM employee WHERE emaill='tara1234@gmail.com'";
+                            ResultSet resultSet=statement.executeQuery(emailEmployee);
+                            while (resultSet.next())
+                            {
+                                String emaill= String.valueOf(resultSet.getInt("emaill"));
+                                if(ep.equals(emaill)){
+                                    JOptionPane.showMessageDialog(f3,"welcome");
+                                }
+                            }
+                            resultSet.close();
+                            statement.close();
+                            connection.close();
+                        } catch (SQLException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                    } catch (SQLException ex) {
+                        throw new RuntimeException(ex);
+                    }
+
+
+                }else if(passenger.isSelected())
+                {
+
+                }
             }else{
                 JOptionPane.showMessageDialog(f3,"bad");
             }
@@ -298,18 +320,17 @@ public class App {
             }
         });
     }
-    public static void employee_management()
-    {
-        Hotel h=new Hotel();
-        JFrame f5=new JFrame("EMPLOYEE MANAGEMENT");
+    public static void employee_management() {
+        Hotel h = new Hotel();
+        JFrame f5 = new JFrame("EMPLOYEE MANAGEMENT");
         f5.setResizable(false);
         f5.getContentPane().setBackground(Color.white);
-        f5.setSize(1000,1000);
+        f5.setSize(1000, 1000);
         f5.setLayout(null);
         f5.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f5.setLocationRelativeTo(null);
-        JPanel panel=new JPanel();
-        panel.setBorder(BorderFactory.createLineBorder(Color.pink,5));
+        JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createLineBorder(Color.pink, 5));
         f5.add(panel);
         JLabel l1 = new JLabel("employee id");
         l1.setFont(new Font("Serif", Font.BOLD, 17));
@@ -403,24 +424,56 @@ public class App {
         add.setSize(100, 20);
         add.setLocation(460, 520);
         f5.add(add);
-        add.addActionListener(e -> {
-            try {
-                sqlcon=DriverManager.getConnection(username,password,dataconn);
-                pst=sqlcon.prepareStatement("INSERT INTO hotel(idemployee,name,lastname,nationalcode,workcode,email,pass,salary)");
-                pst.setString(1,id.getText());
-                pst.setString(2,nam.getText());
-                pst.setString(3,lnam.getText());
-                pst.setString(4,ncode.getText());
-                pst.setString(5,pcode.getText());
-                pst.setString(6,em.getText());
-                pst.setString(7,pas.getText());
-                pst.setString(8,pay.getText());
-                pst.executeUpdate();
-                JOptionPane.showMessageDialog(f5,"new record add");
-                updateDb();
-        } catch (SQLException ex) {
-                throw new RuntimeException(ex);
-            }
+    }
+    public static void userpagee(Passenger passenger)
+    {
+        JFrame f6 = new JFrame("User ");
+        f6.setResizable(false);
+        f6.getContentPane().setBackground(Color.white);
+        f6.setSize(1000, 1000);
+        f6.setLayout(null);
+        f6.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        f6.setLocationRelativeTo(null);
+        f6.setVisible(true);
+        JLabel l1=new JLabel("welcome dear sina ");
+        l1.setFont(new Font("Serif", Font.ITALIC, 50));
+        l1.setForeground(Color.pink);
+        f6.add(l1);
+        l1.setBounds(300, 20, 2000, 100);
+        JLabel l2=new JLabel("what can i do for you?");
+        l2.setFont(new Font("Serif", Font.ITALIC, 30));
+        l2.setForeground(Color.pink);
+        l2.setBounds(350, 100, 2000, 100);
+        f6.add(l2);
+        JButton b1=new JButton("edit profile");
+        b1.setFocusPainted(false);
+        b1.setBorder(new LineBorder(Color.white));
+        b1.setFont(new Font("Arial", Font.PLAIN, 15));
+        b1.setSize(300, 50);
+        b1.setLocation(350, 200);
+        f6.add(b1);
+        b1.addActionListener(e -> {
+
+        });
+        JButton b2=new JButton("reserve");
+        b2.setFocusPainted(false);
+        b2.setBorder(new LineBorder(Color.white));
+        b2.setFont(new Font("Arial", Font.PLAIN, 15));
+        b2.setSize(300, 50);
+        b2.setLocation(350, 250);
+        f6.add(b2);
+        b1.addActionListener(e -> {
+
+        });
+        JButton b3=new JButton("tourist attraction");
+        b3.setFocusPainted(false);
+        b3.setBorder(new LineBorder(Color.white));
+        b3.setFont(new Font("Arial", Font.PLAIN, 15));
+        b3.setSize(300, 50);
+        b3.setLocation(350, 300);
+        f6.add(b3);
+        b1.addActionListener(e -> {
+
         });
     }
     }
