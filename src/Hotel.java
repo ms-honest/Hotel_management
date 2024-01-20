@@ -477,4 +477,102 @@ public class Hotel {
         return true;
     }
 
+//---------------------------------------------------------------------------------
+
+//----------------------------------all about employee----------------------------
+    public static void employeeWrite(Employee e) throws SQLException {
+        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3307/hotel",
+                "root", "zahra1382");
+        Statement statement = connection.createStatement();
+        String sqlQuery = "INSERT INTO employee VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
+        preparedStatement.setInt(1, e.getPerson_id());
+        preparedStatement.setString(2, e.getName());
+        preparedStatement.setString(3, e.getLast_name());
+        preparedStatement.setString(4, e.getNational_code());
+        preparedStatement.setInt(5, e.getWorkcode());
+        preparedStatement.setString(6, e.getEmail());
+        preparedStatement.setString(7, e.getPass());
+        preparedStatement.setDouble(8, e.getSalary());
+        preparedStatement.executeUpdate();
+    }
+
+    public void employeeRead() throws SQLException {
+        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3307/hotel",
+                "root", "zahra1382");
+
+        Statement statement = connection.createStatement();
+        ResultSet employeeRS = statement.executeQuery("SELECT * FROM employee");
+        while (employeeRS.next()) {
+            String name = employeeRS.getString("name");
+            String lastname = employeeRS.getString("lastname");
+            String nationalCode = employeeRS.getString("nationalcode");
+            String workcode = employeeRS.getString("workcode");
+            String email = employeeRS.getString("email");
+            String pass = employeeRS.getString("pass");
+            double salary = employeeRS.getDouble("Salary");
+
+            Employee employee = new Employee(name, lastname, nationalCode, workcode, email, pass, salary);
+            Hotel.employees.add(employee);
+        }
+
+    }
+    public boolean similaremployee(String code, String email) throws SQLException {
+        employeeRead();
+        for (Employee i : employees) {
+            if (code.equals(i.getNational_code()) || email.equals(i.getEmail())) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+        return true;
+    }
+
+    public static void employeeproedit( String name, String lname, String email, String pass,String code,double bank) throws SQLException {
+        for (Employee i : employees) {
+            if (i.getNational_code().equals(code)) {
+                i.setName(name);
+                i.setLast_name(lname);
+                i.setEmail(email);
+                i.setPass(pass);
+                i.setSalary(bank);
+            }
+        }
+        overwriteemmployee();
+    }
+
+    public static void overwriteemmployee() throws SQLException {
+        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3307/hotel", "root", "zahra1382");
+        Statement statement = connection.createStatement();
+        String sql = "DELETE FROM employee";
+        statement.executeUpdate(sql);
+        for(Employee i:employees)
+        {
+            String sqlQuery = "INSERT INTO employee VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
+            preparedStatement.setInt(1, i.getPerson_id());
+            preparedStatement.setString(2, i.getName());
+            preparedStatement.setString(3, i.getLast_name());
+            preparedStatement.setString(4, i.getNational_code());
+            preparedStatement.setInt(5, i.getWorkcode());
+            preparedStatement.setString(6, i.getEmail());
+            preparedStatement.setString(7, i.getPass());
+            preparedStatement.setDouble(8, i.getSalary());
+            preparedStatement.executeUpdate();
+        }
+        connection.close();
+    }
+    public boolean employeeLogin(String email,String pass){
+        for (Employee i : employees) {
+            if (i.getEmail().equals(email) && i.getPass().equals(pass)) {
+                App.employeepage(i);
+                return true;
+            }else{
+                return false;
+            }
+        }
+        return true;
+    }
+
 }
