@@ -12,9 +12,10 @@ import java.util.Vector;
 
 public class App {
     public static Hotel hotel=new Hotel();
-    public static void main(String[] args){
+    public static void main(String[] args) throws SQLException {
         if(connection()==true)
         {
+            hotel.passengerRead();
             start();
         }else{
             System.out.println("database is not connect!");
@@ -170,7 +171,7 @@ public class App {
                         JOptionPane.showMessageDialog(f2,"you have already registered");
                     }else{
                         double bb=Double.parseDouble(b.getText());
-                        Passenger passenger=new Passenger(code.getText(),nam.getText(),lnam.getText(),pass.getText(), em.getText(),bb);
+                        Passenger passenger=new Passenger(code.getText(),nam.getText(),lnam.getText(),p.getText(), em.getText(),bb);
                         Hotel.passengers.add(passenger);
                         Hotel.passengerWrite(passenger);
                         userpagee(passenger);
@@ -284,7 +285,11 @@ public class App {
 
                 }else if(passenger.isSelected())
                 {
+                   if(h.passengerLogin(em.getText(),p.getText())==true){
 
+                   }else{
+                       JOptionPane.showMessageDialog(f3,"check your email and password again!");
+                   }
                 }
             }else{
                 JOptionPane.showMessageDialog(f3,"bad");
@@ -427,7 +432,7 @@ public class App {
     }
     public static void userpagee(Passenger passenger)
     {
-        JFrame f6 = new JFrame("User ");
+        JFrame f6 = new JFrame("User "+passenger.getName());
         f6.setResizable(false);
         f6.getContentPane().setBackground(Color.white);
         f6.setSize(1000, 1000);
@@ -435,7 +440,7 @@ public class App {
         f6.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f6.setLocationRelativeTo(null);
         f6.setVisible(true);
-        JLabel l1=new JLabel("welcome dear sina ");
+        JLabel l1=new JLabel("welcome dear "+passenger.getName());
         l1.setFont(new Font("Serif", Font.ITALIC, 50));
         l1.setForeground(Color.pink);
         f6.add(l1);
@@ -453,7 +458,102 @@ public class App {
         b1.setLocation(350, 200);
         f6.add(b1);
         b1.addActionListener(e -> {
-
+            f6.setVisible(false);
+            int id=passenger.getPerson_id();
+            JFrame f7 = new JFrame("edit profile");
+            f7.setResizable(false);
+            f7.getContentPane().setBackground(Color.white);
+            f7.setSize(1000, 1000);
+            f7.setLayout(null);
+            f7.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            f7.setLocationRelativeTo(null);
+            JLabel lable1=new JLabel("edit profile");
+            lable1.setFont(new Font("Arial", Font.PLAIN, 50));
+            lable1.setSize(250, 50);
+            lable1.setForeground(Color.pink);
+            lable1.setLocation(350, 50);
+            f7.add(lable1);
+            JLabel lable2=new JLabel("fill the form completely with change");
+            lable2.setFont(new Font("Arial", Font.PLAIN, 20));
+            lable2.setSize(400, 100);
+            lable2.setForeground(Color.pink);
+            lable2.setLocation(315, 70);
+            f7.add(lable2);
+            JLabel name=new JLabel("name: "+passenger.getName());
+            name.setFont(new Font("Arial", Font.PLAIN, 20));
+            name.setSize(250, 20);
+            name.setForeground(Color.pink);
+            name.setLocation(230, 220);
+            f7.add(name);
+            JTextField nam = new JTextField();
+            nam.setFont(new Font("Arial", Font.PLAIN, 10));
+            nam.setSize(250, 20);
+            nam.setLocation(480, 220);
+            f7.add(nam);
+            JLabel Lastname=new JLabel(" last name: "+passenger.getLast_name());
+            Lastname.setFont(new Font("Arial", Font.PLAIN, 20));
+            Lastname.setSize(250, 20);
+            Lastname.setForeground(Color.pink);
+            Lastname.setLocation(225, 270);
+            f7.add(Lastname);
+            JTextField lnam = new JTextField();
+            lnam.setFont(new Font("Arial", Font.PLAIN, 10));
+            lnam.setSize(250, 20);
+            lnam.setLocation(480, 270);
+            f7.add(lnam);
+            JLabel email=new JLabel("email: "+passenger.getEmail());
+            email.setFont(new Font("Arial", Font.PLAIN, 20));
+            email.setSize(250, 30);
+            email.setForeground(Color.pink);
+            email.setLocation(230, 315);
+            f7.add(email);
+            JTextField em = new JTextField();
+            em.setFont(new Font("Arial", Font.PLAIN, 10));
+            em.setSize(250, 20);
+            em.setLocation(480, 320);
+            f7.add(em);
+            JLabel pass = new JLabel("pass: "+passenger.getPass());
+            pass.setFont(new Font("Arial", Font.PLAIN, 20));
+            pass.setSize(250, 20);
+            pass.setForeground(Color.pink);
+            pass.setLocation(230, 370);
+            f7.add(pass);
+            JTextField p = new JTextField();
+            p.setFont(new Font("Arial", Font.PLAIN, 10));
+            p.setSize(250, 20);
+            p.setLocation(480, 370);
+            f7.add(p);
+            JLabel bankBalance = new JLabel("Bank: "+passenger.getBankBalance());
+            bankBalance.setFont(new Font("Arial", Font.PLAIN, 20));
+            bankBalance.setForeground(Color.pink);
+            bankBalance.setSize(250, 20);
+            bankBalance.setLocation(230, 420);
+            f7.add(bankBalance);
+            JTextField b = new JTextField();
+            b.setFont(new Font("Arial", Font.PLAIN, 10));
+            b.setSize(250, 20);
+            b.setLocation(480, 420);
+            f7.add(b);
+            JButton sub = new JButton("Submit");
+            sub.setBorder(new LineBorder(Color.white));
+            sub.setFont(new Font("Arial", Font.PLAIN, 15));
+            sub.setSize(100, 20);
+            sub.setLocation(440, 470);
+            f7.add(sub);
+            sub.addActionListener(E ->{
+                double bb=Double.parseDouble(b.getText());
+                try {
+                    if(hotel.signup(nam.getText(),lnam.getText(),passenger.getNational_code(),em.getText(),p.getText())==true){
+                        hotel.userproedit(nam.getText(),lnam.getText(), em.getText(),p.getText(),passenger.getNational_code(),bb);
+                        JOptionPane.showMessageDialog(f7,"your information successfully changed!");
+                    }else{
+                        JOptionPane.showMessageDialog(f7,"try again!");
+                    }
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
+            });
+            f7.setVisible(true);
         });
         JButton b2=new JButton("reserve");
         b2.setFocusPainted(false);
@@ -463,7 +563,8 @@ public class App {
         b2.setLocation(350, 250);
         f6.add(b2);
         b1.addActionListener(e -> {
-
+        passengerReserve();
+        f6.setVisible(false);
         });
         JButton b3=new JButton("tourist attraction");
         b3.setFocusPainted(false);
@@ -473,7 +574,24 @@ public class App {
         b3.setLocation(350, 300);
         f6.add(b3);
         b1.addActionListener(e -> {
-
         });
+        f6.setVisible(true);
     }
+    public static void passengerReserve()
+    {
+        JFrame f9 = new JFrame("reserve");
+        f9.setResizable(false);
+        f9.getContentPane().setBackground(Color.white);
+        f9.setSize(1000, 1000);
+        f9.setLayout(null);
+        f9.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        f9.setLocationRelativeTo(null);
+        JLabel l1 = new JLabel("Registration form");
+        l1.setFont(new Font("Serif", Font.ITALIC, 50));
+        l1.setForeground(Color.pink);
+        l1.setBounds(300, 20, 2000, 100);
+        f9.add(l1);
+        f9.setVisible(true);
+    }
+
     }

@@ -47,9 +47,6 @@ public class Passenger {
         return bankBalance;
     }
 
-    public void setNational_code(String national_code) {
-        this.national_code = national_code;
-    }
 
     public void setName(String name) {
         this.name = name;
@@ -67,5 +64,11 @@ public class Passenger {
         this.email = email;
     }
 
+    public void setBankBalance(double bankBalance) {
+        this.bankBalance = bankBalance;
+    }
 
+    public void setNational_code(String national_code) {
+        this.national_code = national_code;
+    }
 }

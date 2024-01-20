@@ -24,13 +24,13 @@ public class Hotel {
 
             Statement statement = connection.createStatement();
 
-           // statement.execute("USE jdbc");
+            // statement.execute("USE jdbc");
 
             String sql = "DELETE FROM employee";
             statement.executeUpdate(sql);
 
             //sql = "DELETE FROM passenger";
-           // statement.executeUpdate(sql);
+            // statement.executeUpdate(sql);
 
             sql = "DELETE FROM manager";
             statement.executeUpdate(sql);
@@ -146,201 +146,255 @@ public class Hotel {
             System.out.println(e.getMessage());
         }
     }
-        //------------------for add and remove a person or an object------------------
-        public static void addEmployee (Employee employee){
-            employees.add(employee);
-        }
-        public static void addReserve (Reserve reserve){
-            reserves.add(reserve);
-        }
-        public static void addPassenger (Passenger passenger){
-            passengers.add(passenger);
-        }
-        public static void addRoom (Room room){
-            rooms.add(room);
-        }
-        public static void removeEmployee (Employee employee){
-            employees.remove(employee);
-        }
-        public static void removeReserve (Reserve reserve){
-            reserves.remove(reserve);
-        }
-        public static void removePassenger (Passenger passenger){
-            passengers.remove(passenger);
-        }
-        public static void removeRoom (Room room){
-            rooms.remove(room);
-        }
-        //------------------------------------------------------------------------------------
 
-        //--------------------------------sign up method--------------------------------------
-        public boolean signup (String name, String lastname, String code, String email, String pass){
-            String[] Code = code.split("");
-            int c = 0;
-            if (!name.equals("")) {
-                c++;
-            }
-            if (!lastname.equals("")) {
-                c++;
-            }
-            if (Code.length == 10) {
-                c++;
-            }
-            if (cheack(email) == true) {
-                c++;
-            }
-            if (cheackPassword(pass)) {
-                c++;
-            }
-            if (c == 5) {
-                return true;
+    //------------------for add and remove a person or an object------------------
+    public static void addEmployee(Employee employee) {
+        employees.add(employee);
+    }
+
+    public static void addReserve(Reserve reserve) {
+        reserves.add(reserve);
+    }
+
+    public static void addPassenger(Passenger passenger) {
+        passengers.add(passenger);
+    }
+
+    public static void addRoom(Room room) {
+        rooms.add(room);
+    }
+
+    public static void removeEmployee(Employee employee) {
+        employees.remove(employee);
+    }
+
+    public static void removeReserve(Reserve reserve) {
+        reserves.remove(reserve);
+    }
+
+    public static void removePassenger(Passenger passenger) {
+        passengers.remove(passenger);
+    }
+
+    public static void removeRoom(Room room) {
+        rooms.remove(room);
+    }
+    //------------------------------------------------------------------------------------
+
+    //--------------------------------sign up method--------------------------------------
+    public boolean signup(String name, String lastname, String code, String email, String pass) {
+        String[] Code = code.split("");
+        int c = 0;
+        if (!name.equals("")) {
+            c++;
+        }
+        if (!lastname.equals("")) {
+            c++;
+        }
+        if (Code.length == 10) {
+            c++;
+        }
+        if (cheack(email) == true) {
+            c++;
+        }
+        if (cheackPassword(pass)) {
+            c++;
+        }
+        if (c == 5) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean cheack(String email) {
+        String regex = "^[a-zA-Z0-9]+(?:\\.[a-zA-Z0-9.]+)*@" + "(?:[a-zA-Z0-9.]+\\.)+[a-zA-Z]{2,}$";
+        boolean result = email.matches(regex);
+        if (result) {
+            return true;
+        } else
+            return false;
+    }
+
+    public boolean cheackPassword(String in) {
+        int c = 0;
+        if (level1(in) == true) {
+            c++;
+        }
+        if (level2(in) == true) {
+            c++;
+        }
+        if (level3(in) == true) {
+            c++;
+        }
+        if (level4(in) == true) {
+            c++;
+        }
+        if (level5(in) == true) {
+            c++;
+        }
+        if (c >= 3) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static boolean level1(String in) {
+        Pattern pattern1 = Pattern.compile("[a-z]+");
+        Matcher match = pattern1.matcher(in);
+        boolean matchFound = match.find();
+        if (matchFound == true) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static boolean level2(String in) {
+        Pattern pattern2 = Pattern.compile("[A-Z]+");
+        Matcher match = pattern2.matcher(in);
+        boolean matchFound = match.find();
+        if (matchFound == true) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static boolean level3(String in) {
+        Pattern pattern3 = Pattern.compile("[0-9]+");
+        Matcher match = pattern3.matcher(in);
+        boolean matchFound = match.find();
+        if (matchFound == true) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static boolean level4(String in) {
+        Pattern pattern4 = Pattern.compile("[!@#%&/.=]+");
+        Matcher match = pattern4.matcher(in);
+        boolean matchFound = match.find();
+        if (matchFound == true) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static boolean level5(String in) {
+        String[] arr = in.split("");
+        if (arr.length >= 8) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    //-----------------similar user---------------------------------------------------------
+    public boolean similar(String code, String email) throws SQLException {
+        passengerRead();
+        for (Passenger i : passengers) {
+            if (code.equals(i.getNational_code()) || email.equals(i.getEmail())) {
+                return false;
             } else {
-                return false;
+                return true;
             }
+        }
+        return true;
+    }
+
+    //---------------------------------------end---------------------------------------------
+    public boolean log(String email, String pass) {
+        if (email.equals("a") && pass.equals("a")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    //-----------------------------------all about passenger------------------------------
+    public static void passengerWrite(Passenger p) throws SQLException {
+        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3307/hotel",
+                "root", "zahra1382");
+        Statement statement = connection.createStatement();
+        String sqlQuery = "INSERT INTO passenger VALUES (?, ?, ?, ?, ?, ?, ?)";
+        PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
+        preparedStatement.setInt(1, p.getPerson_id());
+        preparedStatement.setString(2, p.getNational_code());
+        preparedStatement.setString(3, p.getName());
+        preparedStatement.setString(4, p.getLast_name());
+        preparedStatement.setString(5, p.getPass());
+        preparedStatement.setString(6, p.getEmail());
+        preparedStatement.setDouble(7, p.getBankBalance());
+        preparedStatement.executeUpdate();
+    }
+
+    public void passengerRead() throws SQLException {
+        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3307/hotel",
+                "root", "zahra1382");
+
+        Statement statement = connection.createStatement();
+        ResultSet passengerRS = statement.executeQuery("SELECT * FROM passenger");
+        while (passengerRS.next()) {
+            String nationalCode = passengerRS.getString("nationalcode");
+            String name = passengerRS.getString("name");
+            String lastname = passengerRS.getString("lastname");
+            String pass = passengerRS.getString("pass");
+            String email = passengerRS.getString("email");
+            double banckblance = passengerRS.getDouble("banckbalance");
+            Passenger passenger = new Passenger(nationalCode, name, lastname, pass, email, banckblance);
+            Hotel.passengers.add(passenger);
         }
 
-        public boolean cheack (String email){
-            String regex = "^[a-zA-Z0-9]+(?:\\.[a-zA-Z0-9.]+)*@" + "(?:[a-zA-Z0-9.]+\\.)+[a-zA-Z]{2,}$";
-            boolean result = email.matches(regex);
-            if (result) {
-                return true;
-            } else
-                return false;
-        }
+    }
 
-        public boolean cheackPassword (String in){
-            int c = 0;
-            if (level1(in) == true) {
-                c++;
-            }
-            if (level2(in) == true) {
-                c++;
-            }
-            if (level3(in) == true) {
-                c++;
-            }
-            if (level4(in) == true) {
-                c++;
-            }
-            if (level5(in) == true) {
-                c++;
-            }
-            if (c >= 3) {
-                return true;
-            } else {
-                return false;
+    public static void userproedit( String name, String lname, String email, String pass,String code,double bank) throws SQLException {
+        for (Passenger i : passengers) {
+            if (i.getNational_code().equals(code)) {
+                i.setName(name);
+                i.setLast_name(lname);
+                i.setEmail(email);
+                i.setPass(pass);
+                i.setBankBalance(bank);
             }
         }
+        overwritepassenger();
+    }
 
-        public static boolean level1 (String in){
-            Pattern pattern1 = Pattern.compile("[a-z]+");
-            Matcher match = pattern1.matcher(in);
-            boolean matchFound = match.find();
-            if (matchFound == true) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        public static boolean level2 (String in){
-            Pattern pattern2 = Pattern.compile("[A-Z]+");
-            Matcher match = pattern2.matcher(in);
-            boolean matchFound = match.find();
-            if (matchFound == true) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        public static boolean level3 (String in){
-            Pattern pattern3 = Pattern.compile("[0-9]+");
-            Matcher match = pattern3.matcher(in);
-            boolean matchFound = match.find();
-            if (matchFound == true) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        public static boolean level4 (String in){
-            Pattern pattern4 = Pattern.compile("[!@#%&/.=]+");
-            Matcher match = pattern4.matcher(in);
-            boolean matchFound = match.find();
-            if (matchFound == true) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        public static boolean level5 (String in){
-            String[] arr = in.split("");
-            if (arr.length >= 8) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-        //-----------------similar user---------------------------------------------------------
-          public boolean similar(String code,String email) throws SQLException {
-          passengerRead();
-          for(Passenger i:passengers)
-          {
-              if(code.equals(i.getNational_code()) || email.equals(i.getEmail()))
-              {
-                  return false;
-              }else {
-                  return true;
-              }
-          }
-          return true;
-          }
-        //---------------------------------------end---------------------------------------------
-        public boolean log (String email, String pass)
+    public static void overwritepassenger() throws SQLException {
+        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3307/hotel", "root", "zahra1382");
+        Statement statement = connection.createStatement();
+        String sql = "DELETE FROM passenger";
+        statement.executeUpdate(sql);
+        for(Passenger i:passengers)
         {
-            if (email.equals("a") && pass.equals("a")) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-        public static void passengerWrite(Passenger p) throws SQLException {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3307/hotel",
-                    "root", "zahra1382");
-
-            Statement statement = connection.createStatement();
-
             String sqlQuery = "INSERT INTO passenger VALUES (?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
-            preparedStatement.setInt(1, p.getPerson_id());
-            preparedStatement.setString(2, p.getNational_code());
-            preparedStatement.setString(3, p.getName());
-            preparedStatement.setString(4, p.getLast_name());
-            preparedStatement.setString(5, p.getPass());
-            preparedStatement.setString(6, p.getEmail());
-            preparedStatement.setDouble(7, p.getBankBalance());
+            preparedStatement.setInt(1, i.getPerson_id());
+            preparedStatement.setString(2, i.getNational_code());
+            preparedStatement.setString(3, i.getName());
+            preparedStatement.setString(4, i.getLast_name());
+            preparedStatement.setString(5, i.getPass());
+            preparedStatement.setString(6, i.getEmail());
+            preparedStatement.setDouble(7, i.getBankBalance());
             preparedStatement.executeUpdate();
         }
+        connection.close();
+    }
 
-        public void passengerRead() throws SQLException {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3307/hotel",
-                    "root", "zahra1382");
-
-            Statement statement = connection.createStatement();
-            ResultSet passengerRS = statement.executeQuery("SELECT * FROM passenger");
-            while (passengerRS.next()) {
-                String nationalCode = passengerRS.getString("nationalcode");
-                String name = passengerRS.getString("name");
-                String lastname = passengerRS.getString("lastname");
-                String pass = passengerRS.getString("pass");
-                String email = passengerRS.getString("email");
-                double banckblance = passengerRS.getDouble("banckbalance");
-                Passenger passenger = new Passenger(nationalCode, name, lastname, pass, email, banckblance);
-                Hotel.passengers.add(passenger);
+    public boolean passengerLogin(String email,String pass){
+        for (Passenger i : passengers) {
+            if (i.getEmail().equals(email) && i.getPass().equals(pass)) {
+                App.userpagee(i);
+                return true;
+            }else{
+                return false;
             }
-
         }
+        return true;
+    }
+ //--------------------------------------------------------------------------------------
 }

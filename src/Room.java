@@ -6,7 +6,7 @@ public class Room {
     private int room_num;
     static int num=1;
 
-    public Room(double price, String bed_type, int bed_num, boolean isVip, int room_num) {
+    public Room(double price, String bed_type, int bed_num, boolean isVip) {
         this.room_num = num;
         this.price = price;
         this.bed_type = bed_type;
