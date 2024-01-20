@@ -292,30 +292,11 @@ public class Hotel {
             return false;
         }
     }
+//---------------------------------------end---------------------------------------------
 
-    //-----------------similar user---------------------------------------------------------
-    public boolean similar(String code, String email) throws SQLException {
-        passengerRead();
-        for (Passenger i : passengers) {
-            if (code.equals(i.getNational_code()) || email.equals(i.getEmail())) {
-                return false;
-            } else {
-                return true;
-            }
-        }
-        return true;
-    }
 
-    //---------------------------------------end---------------------------------------------
-    public boolean log(String email, String pass) {
-        if (email.equals("a") && pass.equals("a")) {
-            return true;
-        } else {
-            return false;
-        }
-    }
 
-    //-----------------------------------all about passenger------------------------------
+//-----------------------------------all about passenger---------------------------------
     public static void passengerWrite(Passenger p) throws SQLException {
         Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3307/hotel",
                 "root", "zahra1382");
@@ -349,6 +330,17 @@ public class Hotel {
             Hotel.passengers.add(passenger);
         }
 
+    }
+    public boolean similar(String code, String email) throws SQLException {
+        passengerRead();
+        for (Passenger i : passengers) {
+            if (code.equals(i.getNational_code()) || email.equals(i.getEmail())) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+        return true;
     }
 
     public static void userproedit( String name, String lname, String email, String pass,String code,double bank) throws SQLException {
@@ -384,7 +376,6 @@ public class Hotel {
         }
         connection.close();
     }
-
     public boolean passengerLogin(String email,String pass){
         for (Passenger i : passengers) {
             if (i.getEmail().equals(email) && i.getPass().equals(pass)) {
@@ -397,4 +388,93 @@ public class Hotel {
         return true;
     }
  //--------------------------------------------------------------------------------------
+
+ //-----------------------------------all about manager----------------------------------
+ public static void managerWrite(Manager m) throws SQLException {
+     Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3307/hotel",
+             "root", "zahra1382");
+     Statement statement = connection.createStatement();
+     String sqlQuery = "INSERT INTO manager VALUES (?, ?, ?, ?, ?, ?)";
+     PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
+     preparedStatement.setInt(1, m.getPerson_id());
+     preparedStatement.setString(2, m.getName());
+     preparedStatement.setString(3, m.getLast_name());
+     preparedStatement.setString(4, m.getNational_code());
+     preparedStatement.setString(5, m.getEmail());
+     preparedStatement.setString(6, m.getPass());
+     preparedStatement.executeUpdate();
+ }
+    public void managerRead() throws SQLException {
+        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3307/hotel",
+                "root", "zahra1382");
+
+        Statement statement = connection.createStatement();
+        ResultSet managerRS = statement.executeQuery("SELECT * FROM manager");
+        while (managerRS.next()) {
+            String name = managerRS.getString("name");
+            String lastname = managerRS.getString("lastname");
+            String nationalCode = managerRS.getString("nationalcode");
+            String email = managerRS.getString("email");
+            String pass = managerRS.getString("pass");
+            Manager manager = new Manager(name,lastname,nationalCode,email,pass);
+            Hotel.managers.add(manager);
+        }
+    }
+
+    public boolean similarmanger(String code, String email) throws SQLException {
+        managerRead();
+        for (Manager i : managers) {
+            if (code.equals(i.getNational_code()) || email.equals(i.getEmail())) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+        return true;
+    }
+
+    public void mangerproedit( String name, String lname, String email, String pass,String code) throws SQLException {
+        for (Manager i : managers) {
+            if (i.getNational_code().equals(code)) {
+                i.setName(name);
+                i.setLast_name(lname);
+                i.setEmail(email);
+                i.setPass(pass);
+            }
+        }
+        overwritemanager();
+    }
+
+    public static void overwritemanager() throws SQLException {
+        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3307/hotel", "root", "zahra1382");
+        Statement statement = connection.createStatement();
+        String sql = "DELETE FROM manager";
+        statement.executeUpdate(sql);
+        for(Manager i:managers)
+        {
+            String sqlQuery = "INSERT INTO manager VALUES (?, ?, ?, ?, ?, ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
+            preparedStatement.setInt(1, i.getPerson_id());
+            preparedStatement.setString(2, i.getName());
+            preparedStatement.setString(3, i.getLast_name());
+            preparedStatement.setString(4, i.getNational_code());
+            preparedStatement.setString(5, i.getEmail());
+            preparedStatement.setString(6, i.getPass());
+            preparedStatement.executeUpdate();
+        }
+        connection.close();
+    }
+    public boolean managerLogin(String email,String pass) {
+        for (Manager i : managers) {
+            System.out.println(i.getName());
+            if (i.getEmail().equals(email) && i.getPass().equals(pass)) {
+                App.managerpage(i);
+                return true;
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
+
 }

@@ -7,7 +7,7 @@ public class Manager {
     private int person_id;
     static int id=1;
 
-    public Manager(String national_code, String name, String last_name, String pass, String email) {
+    public Manager(String name, String last_name,String national_code,String email,String pass) {
         this.person_id = id;
         this.national_code = national_code;
         this.name = name;
