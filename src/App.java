@@ -516,6 +516,30 @@ public class App {
         add.setLocation(780, 200);
         l0.add(add);
         add.addActionListener(e -> {
+            Double p= Double.valueOf(pay.getText());
+            Employee employee=new Employee(nam.getText(), lnam.getText(),ncode.getText(),wcode.getText(),em.getText(), pas.getText(),p);
+            Hotel.employees.add(employee);
+            try {
+                Hotel.employeeWrite(employee);
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+            f6.setVisible(false);
+        });
+        JButton delete = new JButton("delete");
+        delete.setBorder(new LineBorder(Color.white));
+        delete.setFont(new Font("Arial", Font.PLAIN, 15));
+        delete.setSize(100, 20);
+        delete.setLocation(780, 300);
+        l0.add(delete);
+        delete.addActionListener(e -> {
+            int idemployee= Integer.parseInt(id.getText());
+            try {
+                hotel.deletemployee(idemployee,nam.getText(),lnam.getText());
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+
             f6.setVisible(false);
         });
         f6.setVisible(true);
