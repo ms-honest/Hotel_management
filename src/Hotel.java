@@ -1,4 +1,3 @@
-import javax.swing.*;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -130,8 +129,7 @@ public class Hotel {
 //---------------------------------------end---------------------------------------------
 
 
-
-//-----------------------------------all about passenger---------------------------------
+    //-----------------------------------all about passenger---------------------------------
     public static void passengerWrite(Passenger p) throws SQLException {
         Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3307/hotel",
                 "root", "zahra1382");
@@ -166,6 +164,7 @@ public class Hotel {
         }
 
     }
+
     public boolean similar(String code, String email) throws SQLException {
         passengerRead();
         for (Passenger i : passengers) {
@@ -178,7 +177,7 @@ public class Hotel {
         return true;
     }
 
-    public static void userproedit( String name, String lname, String email, String pass,String code,double bank) throws SQLException {
+    public static void userproedit(String name, String lname, String email, String pass, String code, double bank) throws SQLException {
         for (Passenger i : passengers) {
             if (i.getNational_code().equals(code)) {
                 i.setName(name);
@@ -196,8 +195,7 @@ public class Hotel {
         Statement statement = connection.createStatement();
         String sql = "DELETE FROM passenger";
         statement.executeUpdate(sql);
-        for(Passenger i:passengers)
-        {
+        for (Passenger i : passengers) {
             String sqlQuery = "INSERT INTO passenger VALUES (?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
             preparedStatement.setInt(1, i.getPerson_id());
@@ -211,34 +209,33 @@ public class Hotel {
         }
         connection.close();
     }
-    public boolean passengerLogin(String email,String pass){
+
+    public Passenger passengerLogin(String email, String pass) {
         for (Passenger i : passengers) {
             if (i.getEmail().equals(email) && i.getPass().equals(pass)) {
-                App.userpagee(i);
-                return true;
-            }else{
-                return false;
+                return i;
             }
         }
-        return true;
+        return null;
     }
- //--------------------------------------------------------------------------------------
+    //--------------------------------------------------------------------------------------
 
- //-----------------------------------all about manager----------------------------------
- public static void managerWrite(Manager m) throws SQLException {
-     Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3307/hotel",
-             "root", "zahra1382");
-     Statement statement = connection.createStatement();
-     String sqlQuery = "INSERT INTO manager VALUES (?, ?, ?, ?, ?, ?)";
-     PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
-     preparedStatement.setInt(1, m.getPerson_id());
-     preparedStatement.setString(2, m.getName());
-     preparedStatement.setString(3, m.getLast_name());
-     preparedStatement.setString(4, m.getNational_code());
-     preparedStatement.setString(5, m.getEmail());
-     preparedStatement.setString(6, m.getPass());
-     preparedStatement.executeUpdate();
- }
+    //-----------------------------------all about manager----------------------------------
+    public static void managerWrite(Manager m) throws SQLException {
+        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3307/hotel",
+                "root", "zahra1382");
+        Statement statement = connection.createStatement();
+        String sqlQuery = "INSERT INTO manager VALUES (?, ?, ?, ?, ?, ?)";
+        PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
+        preparedStatement.setInt(1, m.getPerson_id());
+        preparedStatement.setString(2, m.getName());
+        preparedStatement.setString(3, m.getLast_name());
+        preparedStatement.setString(4, m.getNational_code());
+        preparedStatement.setString(5, m.getEmail());
+        preparedStatement.setString(6, m.getPass());
+        preparedStatement.executeUpdate();
+    }
+
     public void managerRead() throws SQLException {
         Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3307/hotel",
                 "root", "zahra1382");
@@ -251,7 +248,7 @@ public class Hotel {
             String nationalCode = managerRS.getString("nationalcode");
             String email = managerRS.getString("email");
             String pass = managerRS.getString("pass");
-            Manager manager = new Manager(name,lastname,nationalCode,email,pass);
+            Manager manager = new Manager(name, lastname, nationalCode, email, pass);
             Hotel.managers.add(manager);
         }
     }
@@ -268,7 +265,7 @@ public class Hotel {
         return true;
     }
 
-    public void mangerproedit( String name, String lname, String email, String pass,String code) throws SQLException {
+    public void mangerproedit(String name, String lname, String email, String pass, String code) throws SQLException {
         for (Manager i : managers) {
             if (i.getNational_code().equals(code)) {
                 i.setName(name);
@@ -285,8 +282,7 @@ public class Hotel {
         Statement statement = connection.createStatement();
         String sql = "DELETE FROM manager";
         statement.executeUpdate(sql);
-        for(Manager i:managers)
-        {
+        for (Manager i : managers) {
             String sqlQuery = "INSERT INTO manager VALUES (?, ?, ?, ?, ?, ?)";
             PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
             preparedStatement.setInt(1, i.getPerson_id());
@@ -299,57 +295,65 @@ public class Hotel {
         }
         connection.close();
     }
-    public boolean managerLogin(String email,String pass) {
+
+    public Manager managerLogin(String email, String pass) {
         for (Manager i : managers) {
-            System.out.println(i.getName());
             if (i.getEmail().equals(email) && i.getPass().equals(pass)) {
-                App.managerpage(i);
-                return true;
-            } else {
-                return false;
+                return i;
             }
         }
-        return true;
+        return null;
     }
 
-    public void deletemployee(int employeeid,String name,String lname) throws SQLException {
+    public void deletemployee(int employeeid, String name, String lname) throws SQLException {
         for (Employee i : employees) {
             if (i.getPerson_id() == employeeid && i.getName().equals(name) && i.getLast_name().equals(lname)) {
                 employees.remove(i);
                 String sql = "DELETE FROM employee WHERE idemployee = ?";
                 try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3307/hotel", "root", "zahra1382");
                      PreparedStatement statement = connection.prepareStatement(sql)) {
-                     statement.setInt(1, employeeid);
-                     statement.executeUpdate();
-                     connection.close();
+                    statement.setInt(1, employeeid);
+                    statement.executeUpdate();
+                    connection.close();
                 }
-                    break;
+                break;
+            }
+        }
+
+    }
+
+    public void payment(int employeeid,double pay) throws SQLException {
+        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3307/hotel", "root", "zahra1382");
+        Statement statement = connection.createStatement();
+        String sql = "DELETE FROM employee";
+        statement.executeUpdate(sql);
+        for (Employee i : employees) {
+            if (i.getPerson_id() == employeeid) {
+                i.setSalary(pay);
                 }
             }
 
-        /*for(Employee e:employees)
-        {
+        for (Employee i : employees) {
             String sqlQuery = "INSERT INTO employee VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
-            preparedStatement.setInt(1, e.getPerson_id());
-            preparedStatement.setString(2, e.getName());
-            preparedStatement.setString(3, e.getLast_name());
-            preparedStatement.setString(4, e.getNational_code());
-            preparedStatement.setInt(5, e.getWorkcode());
-            preparedStatement.setString(6, e.getEmail());
-            preparedStatement.setString(7, e.getPass());
-            preparedStatement.setDouble(8, e.getSalary());
+            preparedStatement.setInt(1, i.getPerson_id());
+            preparedStatement.setString(2, i.getName());
+            preparedStatement.setString(3, i.getLast_name());
+            preparedStatement.setString(4, i.getNational_code());
+            preparedStatement.setInt(5, i.getWorkcode());
+            preparedStatement.setString(6, i.getEmail());
+            preparedStatement.setString(7, i.getPass());
+            preparedStatement.setDouble(8, i.getSalary());
             preparedStatement.executeUpdate();
-        }*/
-
-
+        }
+        connection.close();
         }
 
 
 
 //---------------------------------------------------------------------------------
 
-//----------------------------------all about employee----------------------------
+    //----------------------------------all about employee----------------------------
     public static void employeeWrite(Employee e) throws SQLException {
         Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3307/hotel",
                 "root", "zahra1382");
@@ -387,6 +391,7 @@ public class Hotel {
         }
 
     }
+
     public boolean similaremployee(String code, String email) throws SQLException {
         employeeRead();
         for (Employee i : employees) {
@@ -399,7 +404,7 @@ public class Hotel {
         return true;
     }
 
-    public static void employeeproedit( String name, String lname, String email, String pass,String code,double bank) throws SQLException {
+    public static void employeeproedit(String name, String lname, String email, String pass, String code, double bank) throws SQLException {
         for (Employee i : employees) {
             if (i.getNational_code().equals(code)) {
                 i.setName(name);
@@ -417,8 +422,7 @@ public class Hotel {
         Statement statement = connection.createStatement();
         String sql = "DELETE FROM employee";
         statement.executeUpdate(sql);
-        for(Employee i:employees)
-        {
+        for (Employee i : employees) {
             String sqlQuery = "INSERT INTO employee VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
             preparedStatement.setInt(1, i.getPerson_id());
@@ -433,16 +437,15 @@ public class Hotel {
         }
         connection.close();
     }
-    public boolean employeeLogin(String email,String pass){
+
+    public Employee employeeLogin(String email, String pass) {
         for (Employee i : employees) {
             if (i.getEmail().equals(email) && i.getPass().equals(pass)) {
-                App.employeepage(i);
-                return true;
-            }else{
-                return false;
+                return i;
+
             }
         }
-        return true;
+        return null;
     }
-//-----------------------------------------------------------------------------------------
 }
+//-----------------------------------------------------------------------------------------

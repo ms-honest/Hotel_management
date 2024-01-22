@@ -254,26 +254,28 @@ public class App {
             {
                 if(manager.isSelected())
                 {
-                    if (h.managerLogin(em.getText(),p.getText())==true)
+                    if (h.managerLogin(em.getText(),p.getText())==null)
                     {
-                    }else{
                         JOptionPane.showMessageDialog(f3,"check your email and password again!");
+                    }else{
+                        managerpage(h.managerLogin(em.getText(),p.getText()));
                     }
                 }
                 else if(employee.isSelected())
                 {
-                    if (h.employeeLogin(em.getText(),p.getText())==true)
+                    if (h.employeeLogin(em.getText(),p.getText())==null)
                     {
-                    }else{
                         JOptionPane.showMessageDialog(f3,"check your email and password again!");
+                    }else{
+                        employeepage(h.employeeLogin(em.getText(),p.getText()));
                     }
                 }
                 else if(passenger.isSelected())
                 {
-                   if(h.passengerLogin(em.getText(),p.getText())==true){
-
-                   }else{
+                   if(h.passengerLogin(em.getText(),p.getText())==null){
                        JOptionPane.showMessageDialog(f3,"check your email and password again!");
+                   }else{
+                       userpagee(h.passengerLogin(em.getText(),p.getText()));
                    }
                 }
             }else{
@@ -540,6 +542,23 @@ public class App {
                 throw new RuntimeException(ex);
             }
 
+            f6.setVisible(false);
+        });
+
+        JButton payment = new JButton("payment");
+        payment.setBorder(new LineBorder(Color.white));
+        payment.setFont(new Font("Arial", Font.PLAIN, 15));
+        payment.setSize(100, 20);
+        payment.setLocation(780, 400);
+        l0.add(payment);
+        payment.addActionListener(e -> {
+            int idemployee= Integer.parseInt(id.getText());
+            double p= Double.parseDouble(pay.getText());
+            try {
+                h.payment(idemployee,p);
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
             f6.setVisible(false);
         });
         f6.setVisible(true);
