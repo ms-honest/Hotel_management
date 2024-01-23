@@ -2,11 +2,11 @@ public class Room {
     private double price;
     private String bed_type;
     private int bed_num;
-    private boolean isVip;
+    private int isVip;
     private int room_num;
     static int num=1;
 
-    public Room(double price,int bed_num, boolean isVip) {
+    public Room(double price,int bed_num, int isVip) {
         this.room_num = num;
         this.price = price;
         this.bed_num = bed_num;
@@ -23,8 +23,12 @@ public class Room {
     }
 
 
-    public boolean isVip() {
+    public int isVip() {
         return isVip;
+    }
+
+    public int getRoom_num() {
+        return room_num;
     }
 
     public void setPrice(double price) {
@@ -35,7 +39,5 @@ public class Room {
         this.bed_num = bed_num;
     }
 
-    public void setVip(boolean vip) {
-        isVip = vip;
-    }
+
 }

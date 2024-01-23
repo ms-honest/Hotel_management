@@ -447,5 +447,77 @@ public class Hotel {
         }
         return null;
     }
+    //-----------------------------------------------------------------------------------------
+
+   //---------------------------------all about rooms and reserves-----------------------------
+
+    public static void roomsWrite(Room r) throws SQLException {
+        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3307/hotel",
+                "root", "zahra1382");
+        Statement statement = connection.createStatement();
+        String sqlQuery = "INSERT INTO rooms VALUES (?, ?, ?, ?)";
+        PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
+        preparedStatement.setInt(1, r.getRoom_num());
+        preparedStatement.setDouble(2, r.getPrice());
+        preparedStatement.setInt(3, r.getBed_num());
+        preparedStatement.setInt(4, r.isVip());
+        preparedStatement.executeUpdate();
+    }
+
+    public void roomsRead() throws SQLException {
+        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3307/hotel",
+                "root", "zahra1382");
+
+        Statement statement = connection.createStatement();
+        ResultSet roomsRS = statement.executeQuery("SELECT * FROM rooms");
+        while (roomsRS.next()) {
+            double price = roomsRS.getDouble("price");
+            int bednum = roomsRS.getInt("bednumber");
+            int isvip = roomsRS.getInt("isvip");
+            Room room = new Room(price,bednum,isvip);
+            Hotel.rooms.add(room);
+        }
+    }
+
+    public void deleteroom(int roomnum) throws SQLException {
+        for (Room i : rooms) {
+            if (i.getRoom_num()==roomnum) {
+                rooms.remove(i);
+                String sql = "DELETE FROM rooms WHERE roomnum = ?";
+                try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3307/hotel", "root", "zahra1382");
+                     PreparedStatement statement = connection.prepareStatement(sql)) {
+                     statement.setInt(1, roomnum);
+                     statement.executeUpdate();
+                     connection.close();
+                }
+            }
+        }
+
+    }
+
+    public void price(int roomnum,double price) throws SQLException {
+        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3307/hotel", "root", "zahra1382");
+        Statement statement = connection.createStatement();
+        String sql = "DELETE FROM rooms";
+        statement.executeUpdate(sql);
+        for (Room i : rooms) {
+            if (i.getRoom_num()== roomnum) {
+                i.setPrice(price);
+            }
+        }
+
+        for (Room i : rooms) {
+            String sqlQuery = "INSERT INTO rooms VALUES (?, ?, ?, ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
+            preparedStatement.setInt(1, i.getRoom_num());
+            preparedStatement.setDouble(2, i.getPrice());
+            preparedStatement.setInt(3, i.getBed_num());
+            preparedStatement.setInt(4, i.isVip());
+            preparedStatement.executeUpdate();
+        }
+        connection.close();
+    }
+
 }
-//-----------------------------------------------------------------------------------------
+
+

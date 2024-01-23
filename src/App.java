@@ -18,6 +18,7 @@ public class App {
             hotel.managerRead();
             hotel.passengerRead();
             hotel.employeeRead();
+            hotel.roomsRead();
             start();
         }else{
             System.out.println("database is not connect!");
@@ -416,6 +417,17 @@ public class App {
             employee_management();
             f4.setVisible(false);
         });
+        JButton b4=new JButton("room management");
+        b4.setFocusPainted(false);
+        b4.setBorder(new LineBorder(Color.white));
+        b4.setFont(new Font("Arial", Font.PLAIN, 15));
+        b4.setSize(400, 50);
+        b4.setLocation(350, 400);
+        f4.add(b4);
+        b4.addActionListener(e -> {
+            room_management();
+            f4.setVisible(false);
+        });
         f4.setVisible(true);
     }
     public static void employee_management() {
@@ -719,10 +731,10 @@ public class App {
         f9.setLayout(null);
         f9.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f9.setLocationRelativeTo(null);
-        JLabel l1 = new JLabel("Registration form");
+        JLabel l1 = new JLabel("Reserve");
         l1.setFont(new Font("Serif", Font.ITALIC, 50));
         l1.setForeground(Color.pink);
-        l1.setBounds(300, 20, 2000, 100);
+        l1.setBounds(400, 20, 2000, 100);
         f9.add(l1);
         f9.setVisible(true);
     }
@@ -872,5 +884,126 @@ public class App {
         b1.addActionListener(e -> {
         });
         f6.setVisible(true);
+    }
+
+    public static void room_management()
+    {
+        Hotel h = new Hotel();
+        JFrame f6 = new JFrame("ROOMS MANAGEMENT");
+        f6.setResizable(false);
+        f6.getContentPane().setBackground(Color.white);
+        f6.setSize(1000, 1000);
+        f6.setLayout(null);
+        f6.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        f6.setLocationRelativeTo(null);
+        ImageIcon icon = new ImageIcon("C:\\Users\\saraye tel\\Desktop\\hotel_managementservice\\Hotel_management\\pic\\back.jpg");
+        JLabel l0=new JLabel(icon);
+        l0.setBounds(0,0,1000,1000);
+        f6.add(l0);
+        JLabel l1 = new JLabel("ROOM NUMBER");
+        l1.setFont(new Font("Serif", Font.BOLD, 20));
+        l1.setForeground(Color.white);
+        l1.setBounds(10, 110, 2000, 100);
+        l0.add(l1);
+        JLabel l2 = new JLabel("PRICE");
+        l2.setFont(new Font("Serif", Font.BOLD, 20));
+        l2.setForeground(Color.white);
+        l2.setBounds(10, 160, 2000, 100);
+        l0.add(l2);
+        JLabel l3 = new JLabel("BED NUMBER");
+        l3.setFont(new Font("Serif", Font.BOLD, 20));
+        l3.setForeground(Color.white);
+        l3.setBounds(10, 210, 2000, 100);
+        l0.add(l3);
+        JTextField roomnum = new JTextField();
+        roomnum.setFont(new Font("Arial", Font.BOLD, 15));
+        roomnum.setSize(300, 20);
+        roomnum.setLocation(150, 150);
+        l0.add(roomnum);
+        JTextField price = new JTextField();
+        price.setFont(new Font("Arial", Font.BOLD, 15));
+        price.setSize(300, 20);
+        price.setLocation(150, 200);
+        l0.add(price);
+        JTextField bednum = new JTextField();
+        bednum.setFont(new Font("Arial", Font.PLAIN, 15));
+        bednum.setSize(300, 20);
+        bednum.setLocation(150, 250);
+        l0.add(bednum);
+        JRadioButton vip = new JRadioButton("vip");
+        vip.setFont(new Font("Arial", Font.PLAIN, 15));
+        vip.setSelected(true);
+        vip.setSize(100, 20);
+        vip.setLocation(365, 470);
+        l0.add(vip);
+        JRadioButton standard = new JRadioButton("standard");
+        standard.setFont(new Font("Arial", Font.PLAIN, 15));
+        standard.setSelected(false);
+        standard.setSize(100, 20);
+        standard.setLocation(465, 470);
+        l0.add(standard);
+        ButtonGroup room = new ButtonGroup();
+        room.add(vip);
+        room.add(standard);
+        JButton add = new JButton("add");
+        add.setBorder(new LineBorder(Color.white));
+        add.setFont(new Font("Arial", Font.PLAIN, 15));
+        add.setSize(100, 20);
+        add.setLocation(780, 200);
+        l0.add(add);
+        add.addActionListener(e -> {
+            int roomtype;
+            if(vip.isSelected())
+            {
+                 roomtype=1;
+            }else{
+                roomtype=0;
+            }
+            Double p= Double.valueOf(price.getText());
+            Integer bnum= Integer.valueOf(bednum.getText());
+            Room room1=new Room(p,bnum,roomtype);
+            Hotel.rooms.add(room1);
+            try {
+                Hotel.roomsWrite(room1);
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+            f6.setVisible(false);
+        });
+        JButton delete = new JButton("delete");
+        delete.setBorder(new LineBorder(Color.white));
+        delete.setFont(new Font("Arial", Font.PLAIN, 15));
+        delete.setSize(100, 20);
+        delete.setLocation(780, 300);
+        l0.add(delete);
+        delete.addActionListener(e -> {
+            int roomnumber= Integer.parseInt(roomnum.getText());
+            try {
+                hotel.deleteroom(roomnumber);
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+
+            f6.setVisible(false);
+        });
+
+        JButton price1 = new JButton("price");
+        price1.setBorder(new LineBorder(Color.white));
+        price1.setFont(new Font("Arial", Font.PLAIN, 15));
+        price1.setSize(100, 20);
+        price1.setLocation(780, 400);
+        l0.add(price1);
+        price1.addActionListener(e -> {
+            int rnum= Integer.parseInt(roomnum.getText());
+            double p= Double.parseDouble(price.getText());
+            try {
+                h.price(rnum,p);
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+            f6.setVisible(false);
+        });
+        f6.setVisible(true);
+
     }
     }
