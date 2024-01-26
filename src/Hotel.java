@@ -1,3 +1,6 @@
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -13,6 +16,8 @@ public class Hotel {
     public static Queue<Reserve> reserves = new LinkedList<>();
     public static List<Passenger> passengers = new ArrayList<>();
     public static List<Room> rooms = new ArrayList<>();
+    public static List<hotelBank> bank = new ArrayList<>();
+    public static List<Waiting> waitings=new ArrayList<>();
     //------------------------------------------------------------------------------------
 
     //--------------------------------sign up method--------------------------------------
@@ -166,15 +171,34 @@ public class Hotel {
     }
 
     public boolean similar(String code, String email) throws SQLException {
-        passengerRead();
+        int c=0;
         for (Passenger i : passengers) {
             if (code.equals(i.getNational_code()) || email.equals(i.getEmail())) {
-                return false;
+                c=0;
             } else {
-                return true;
+                c++;
             }
         }
-        return true;
+        for(Employee i: employees){
+            if (code.equals(i.getNational_code()) || email.equals(i.getEmail())) {
+                c=0;
+            } else {
+                c++;
+            }
+        }
+        for(Manager i:managers){
+            if (code.equals(i.getNational_code()) || email.equals(i.getEmail())) {
+                c=0;
+            } else {
+                c++;
+            }
+        }
+        if(c==3){
+            return true;
+        }else{
+            return false;
+        }
+
     }
 
     public static void userproedit(String name, String lname, String email, String pass, String code, double bank) throws SQLException {
@@ -404,7 +428,7 @@ public class Hotel {
         return true;
     }
 
-    public static void employeeproedit(String name, String lname, String email, String pass, String code, double bank) throws SQLException {
+    public void employeeproedit(String name, String lname, String email, String pass, String code, double bank) throws SQLException {
         for (Employee i : employees) {
             if (i.getNational_code().equals(code)) {
                 i.setName(name);
@@ -460,7 +484,7 @@ public class Hotel {
         preparedStatement.setInt(1, r.getRoom_num());
         preparedStatement.setDouble(2, r.getPrice());
         preparedStatement.setInt(3, r.getBed_num());
-        preparedStatement.setInt(4, r.isVip());
+        preparedStatement.setInt(4, r.getIsave());
         preparedStatement.executeUpdate();
     }
 
@@ -473,8 +497,8 @@ public class Hotel {
         while (roomsRS.next()) {
             double price = roomsRS.getDouble("price");
             int bednum = roomsRS.getInt("bednumber");
-            int isvip = roomsRS.getInt("isvip");
-            Room room = new Room(price,bednum,isvip);
+            int isave = roomsRS.getInt("isave");
+            Room room = new Room(price,bednum,isave);
             Hotel.rooms.add(room);
         }
     }
@@ -512,12 +536,199 @@ public class Hotel {
             preparedStatement.setInt(1, i.getRoom_num());
             preparedStatement.setDouble(2, i.getPrice());
             preparedStatement.setInt(3, i.getBed_num());
-            preparedStatement.setInt(4, i.isVip());
+            preparedStatement.setInt(4, i.getIsave());
             preparedStatement.executeUpdate();
         }
         connection.close();
     }
 
+    public Room cheackroom(int bed) throws SQLException {
+        for (Room r : rooms) {
+            if (r.getBed_num() == bed && r.getIsave() == 0) {
+                notave(r.getRoom_num());
+                return r;
+            }
+        }
+        return null;
+    }
+
+    public void notave(int roomnum) throws SQLException {
+        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3307/hotel", "root", "zahra1382");
+        Statement statement = connection.createStatement();
+        String sql = "DELETE FROM rooms";
+        statement.executeUpdate(sql);
+        for (Room i : rooms) {
+            if (i.getRoom_num()== roomnum) {
+               i.setIsave(-1);
+            }
+        }
+
+        for (Room i : rooms) {
+            String sqlQuery = "INSERT INTO rooms VALUES (?, ?, ?, ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
+            preparedStatement.setInt(1, i.getRoom_num());
+            preparedStatement.setDouble(2, i.getPrice());
+            preparedStatement.setInt(3, i.getBed_num());
+            preparedStatement.setInt(4, i.getIsave());
+            preparedStatement.executeUpdate();
+        }
+        connection.close();
+    }
+
+    public void makeave(int roomnum) throws SQLException {
+        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3307/hotel", "root", "zahra1382");
+        Statement statement = connection.createStatement();
+        String sql = "DELETE FROM rooms";
+        statement.executeUpdate(sql);
+        for (Room i : rooms) {
+            if (i.getRoom_num()== roomnum) {
+                i.setIsave(0);
+            }
+        }
+
+        for (Room i : rooms) {
+            String sqlQuery = "INSERT INTO rooms VALUES (?, ?, ?, ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
+            preparedStatement.setInt(1, i.getRoom_num());
+            preparedStatement.setDouble(2, i.getPrice());
+            preparedStatement.setInt(3, i.getBed_num());
+            preparedStatement.setInt(4, i.getIsave());
+            preparedStatement.executeUpdate();
+        }
+        connection.close();
+    }
+    public void employee_check_reserve(Employee employee)
+    {
+        JFrame f8 = new JFrame("User "+employee.getName());
+        f8.setResizable(false);
+        f8.getContentPane().setBackground(Color.white);
+        f8.setSize(1000,800);
+        JTable table=new JTable();
+        JPanel panel = new JPanel();
+        panel.setLayout(null);
+        DefaultTableModel model  = new DefaultTableModel();
+        model.addColumn(" ");
+        model.addColumn("passenger code");
+        model.addColumn("stay time");
+        model.addColumn("bed number");
+        model.addColumn("room number");
+        model.addColumn("pay");
+        for (Waiting w : waitings) {
+
+            model.addRow(new Object[]{w.getWaiting_id(),w.getNational(),w.getStaytime(), w.getBednumber(),w.getRoomnumber(),w.getPay()});
+        }
+        table = new JTable(model);
+        JButton acceptButton = new JButton("Accept");
+        JButton declineButton = new JButton("Decline");
+        JTextField textField = new JTextField(20);
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(acceptButton);
+        buttonPanel.add(declineButton);
+        buttonPanel.add(textField);
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.add(new JScrollPane(table), BorderLayout.CENTER);
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+        f8.add(mainPanel);
+        acceptButton.addActionListener(e -> {
+            int id= Integer.parseInt(textField.getText());
+            for(Waiting w:waitings)
+            {
+                if(w.getWaiting_id()==id)
+                {
+                    try {
+                        deletewaiting(id);
+                        JOptionPane.showMessageDialog(f8,"the request accepted");
+                        Reserve reserve=new Reserve(w.getNational(),w.getPay(),employee.getNational_code(),w.getStaytime(),w.getRoomnumber());
+                        reserves.add(reserve);
+                        App.employeepage(employee);
+                        f8.setVisible(false);
+                    } catch (SQLException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+            }
+        });
+
+        declineButton.addActionListener(e -> {
+            int id= Integer.parseInt(textField.getText());
+            for(Waiting w:waitings){
+                if(w.getWaiting_id()==id){
+                    for(Room r:rooms){
+                        try {
+                            makeave(r.getRoom_num());
+                        } catch (SQLException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                    }
+                    JOptionPane.showMessageDialog(f8,"the request declined");
+                }
+            }
+        });
+        f8.setVisible(true);
+    }
+
+//----------------------------------------------waiting-------------------------------------------
+    public void waitingWrite(Waiting w) throws SQLException {
+        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3307/hotel",
+                "root", "zahra1382");
+        Statement statement = connection.createStatement();
+        String sqlQuery = "INSERT INTO waitings VALUES (?, ?, ?, ?, ?, ?)";
+        PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
+        preparedStatement.setInt(1, w.getWaiting_id());
+        preparedStatement.setString(2, w.getNational());
+        preparedStatement.setInt(3, w.getStaytime());
+        preparedStatement.setInt(4, w.getBednumber());
+        preparedStatement.setInt(5, w.getRoomnumber());
+        preparedStatement.setDouble(6, w.getPay());
+        preparedStatement.executeUpdate();
+    }
+
+    public void waitingRead() throws SQLException {
+        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3307/hotel",
+                "root", "zahra1382");
+
+        Statement statement = connection.createStatement();
+        ResultSet waitingRS = statement.executeQuery("SELECT * FROM waitings");
+        while (waitingRS.next()) {
+            String code = waitingRS.getString("nationalcode");
+            int staytime = waitingRS.getInt("staytime");
+            int bednumber = waitingRS.getInt("bednumber");
+            int roomnumber = waitingRS.getInt("roomnumber");
+            double pay = waitingRS.getDouble("pay");
+            Waiting waiting = new Waiting(code,staytime,bednumber,roomnumber,pay);
+            Hotel.waitings.add(waiting);
+        }
+    }
+    public static void deletewaiting(int waitid) throws SQLException {
+        for (Waiting i : waitings) {
+            if (i.getWaiting_id() == waitid) {
+                waitings.remove(i);
+                String sql = "DELETE FROM waitings WHERE idwaitings = ?";
+                try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3307/hotel", "root", "zahra1382");
+                     PreparedStatement statement = connection.prepareStatement(sql)) {
+                    statement.setInt(1, waitid);
+                    statement.executeUpdate();
+                    connection.close();
+                }
+                break;
+            }
+        }
+
+    }
+
+    //------------------------------------------------------------------------------------------------------
+
+    //--------------------------------------------------bank-------------------------------------------------
+    public static void bank()
+    {
+        for (Passenger i:passengers)
+        {
+            hotelBank bank=new hotelBank(i.getNational_code(),i.getBankBalance(),0,0,0);
+
+        }
+
+
+    }
 }
 
 

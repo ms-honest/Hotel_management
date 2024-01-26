@@ -1,16 +1,15 @@
 public class Room {
     private double price;
-    private String bed_type;
     private int bed_num;
-    private int isVip;
+    private int isave;
     private int room_num;
     static int num=1;
 
-    public Room(double price,int bed_num, int isVip) {
+    public Room(double price,int bed_num, int isave) {
         this.room_num = num;
         this.price = price;
         this.bed_num = bed_num;
-        this.isVip = isVip;
+        this.isave = isave;
         num++;
     }
 
@@ -22,9 +21,12 @@ public class Room {
         return bed_num;
     }
 
+    public int getIsave() {
+        return isave;
+    }
 
-    public int isVip() {
-        return isVip;
+    public void setIsave(int isave) {
+        this.isave = isave;
     }
 
     public int getRoom_num() {

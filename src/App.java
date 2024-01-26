@@ -8,10 +8,12 @@ import java.awt.event.KeyEvent;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Vector;
 
 public class App {
     public static Hotel hotel=new Hotel();
+    public static double money;
     public static void main(String[] args) throws SQLException {
         if(connection()==true)
         {
@@ -19,6 +21,7 @@ public class App {
             hotel.passengerRead();
             hotel.employeeRead();
             hotel.roomsRead();
+            hotel.waitingRead();
             start();
         }else{
             System.out.println("database is not connect!");
@@ -707,8 +710,8 @@ public class App {
         b2.setSize(300, 50);
         b2.setLocation(350, 250);
         f6.add(b2);
-        b1.addActionListener(e -> {
-        passengerReserve();
+        b2.addActionListener(e -> {
+        passengerReserve(passenger);
         f6.setVisible(false);
         });
         JButton b3=new JButton("tourist attraction");
@@ -722,7 +725,7 @@ public class App {
         });
         f6.setVisible(true);
     }
-    public static void passengerReserve()
+    public static void passengerReserve(Passenger passenger)
     {
         JFrame f9 = new JFrame("reserve");
         f9.setResizable(false);
@@ -736,6 +739,70 @@ public class App {
         l1.setForeground(Color.pink);
         l1.setBounds(400, 20, 2000, 100);
         f9.add(l1);
+        JLabel l2 = new JLabel("dear "+passenger.getName()+" lets find the best room for you");
+        l2.setFont(new Font("Serif", Font.ITALIC, 30));
+        l2.setForeground(Color.pink);
+        l2.setBounds(250, 70, 2000, 100);
+        f9.add(l2);
+        JLabel l3 = new JLabel("staying time");
+        l3.setFont(new Font("Serif", Font.ITALIC, 20));
+        l3.setForeground(Color.pink);
+        l3.setBounds(390, 170, 2000, 100);
+        f9.add(l3);
+        JTextField time = new JTextField();
+        time.setFont(new Font("Arial", Font.PLAIN, 10));
+        time.setSize(50, 20);
+        time.setLocation(500, 215);
+        f9.add(time);
+        JLabel l4 = new JLabel("bed number");
+        l4.setFont(new Font("Serif", Font.ITALIC, 20));
+        l4.setForeground(Color.pink);
+        l4.setBounds(390, 250, 2000, 100);
+        f9.add(l4);
+        JTextField bed = new JTextField();
+        bed.setFont(new Font("Arial", Font.PLAIN, 10));
+        bed.setSize(50, 20);
+        bed.setLocation(500, 295);
+        f9.add(bed);
+        JButton sub = new JButton("Submit");
+        sub.setBorder(new LineBorder(Color.white));
+        sub.setFont(new Font("Arial", Font.PLAIN, 15));
+        sub.setSize(100, 20);
+        sub.setLocation(440, 450);
+        f9.add(sub);
+        sub.addActionListener(e -> {
+            int stime= Integer.parseInt(time.getText());
+            int bednum= Integer.parseInt(bed.getText());
+            Room r= null;
+            try {
+                r = hotel.cheackroom(bednum);
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+            if(r==null){
+                JOptionPane.showMessageDialog(f9,"not found):");
+            }else{
+                JOptionPane.showMessageDialog(f9,"you have to pay: "+r.getPrice()*stime);
+                Waiting waite=new Waiting(passenger.getNational_code(),stime,bednum,r.getRoom_num(),r.getPrice()*stime);
+                Hotel.waitings.add(waite);
+                try {
+                    hotel.waitingWrite(waite);
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        f9.setVisible(false);
+        });
+        JButton menu = new JButton("menu");
+        menu.setBorder(new LineBorder(Color.white));
+        menu.setFont(new Font("Arial", Font.PLAIN, 15));
+        menu.setSize(100, 20);
+        menu.setLocation(440, 550);
+        f9.add(menu);
+        menu.addActionListener(e -> {
+            start();
+            f9.setVisible(false);
+        });
         f9.setVisible(true);
     }
 
@@ -837,11 +904,6 @@ public class App {
             bankBalance.setSize(250, 20);
             bankBalance.setLocation(230, 420);
             f7.add(bankBalance);
-            JTextField b = new JTextField();
-            b.setFont(new Font("Arial", Font.PLAIN, 10));
-            b.setSize(250, 20);
-            b.setLocation(480, 420);
-            f7.add(b);
             JButton sub = new JButton("Submit");
             sub.setBorder(new LineBorder(Color.white));
             sub.setFont(new Font("Arial", Font.PLAIN, 15));
@@ -849,10 +911,9 @@ public class App {
             sub.setLocation(440, 470);
             f7.add(sub);
             sub.addActionListener(E ->{
-                double bb=Double.parseDouble(b.getText());
                 try {
                     if(hotel.signup(nam.getText(),lnam.getText(),employee.getNational_code(),em.getText(),p.getText())==true){
-                        hotel.userproedit(nam.getText(),lnam.getText(), em.getText(),p.getText(),employee.getNational_code(),bb);
+                        hotel.employeeproedit(nam.getText(),lnam.getText(), em.getText(),p.getText(),employee.getNational_code(),employee.getSalary());
                         JOptionPane.showMessageDialog(f7,"your information successfully changed!");
                     }else{
                         JOptionPane.showMessageDialog(f7,"try again!");
@@ -870,21 +931,47 @@ public class App {
         b2.setSize(300, 50);
         b2.setLocation(350, 250);
         f6.add(b2);
-        b1.addActionListener(e -> {
-            passengerReserve();
+        b2.addActionListener(e -> {
             f6.setVisible(false);
+            JFrame f7 = new JFrame("reservation status");
+            f7.setResizable(false);
+            f7.getContentPane().setBackground(Color.white);
+            f7.setSize(1000, 1000);
+            f7.setLayout(null);
+            f7.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            f7.setLocationRelativeTo(null);
+            JButton waiting = new JButton("waiting");
+            waiting.setBorder(new LineBorder(Color.white));
+            waiting.setFont(new Font("Arial", Font.PLAIN, 15));
+            waiting.setSize(100, 20);
+            waiting.setLocation(440, 100);
+            f7.add(waiting);
+            waiting.addActionListener(E -> {
+                hotel.employee_check_reserve(employee);
+                f7.setVisible(false);
+            });
+            JButton accepted = new JButton("accepted");
+            accepted.setBorder(new LineBorder(Color.white));
+            accepted.setFont(new Font("Arial", Font.PLAIN, 15));
+            accepted.setSize(100, 20);
+            accepted.setLocation(440, 200);
+            f7.add(accepted);
+            accepted.addActionListener(E -> {
+                f6.setVisible(false);
+            });
+            JButton finished = new JButton("finished");
+            finished.setBorder(new LineBorder(Color.white));
+            finished.setFont(new Font("Arial", Font.PLAIN, 15));
+            finished.setSize(100, 20);
+            finished.setLocation(440, 300);
+            f7.add(finished);
+            finished.addActionListener(E -> {
+                f6.setVisible(false);
+            });
+            f7.setVisible(true);
         });
-        JButton b3=new JButton("tourist attraction");
-        b3.setFocusPainted(false);
-        b3.setBorder(new LineBorder(Color.white));
-        b3.setFont(new Font("Arial", Font.PLAIN, 15));
-        b3.setSize(300, 50);
-        b3.setLocation(350, 300);
-        f6.add(b3);
-        b1.addActionListener(e -> {
-        });
-        f6.setVisible(true);
     }
+
 
     public static void room_management()
     {
@@ -1004,6 +1091,5 @@ public class App {
             f6.setVisible(false);
         });
         f6.setVisible(true);
-
     }
     }
