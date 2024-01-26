@@ -22,6 +22,7 @@ public class App {
             hotel.employeeRead();
             hotel.roomsRead();
             hotel.waitingRead();
+            hotel.declineread();
             start();
         }else{
             System.out.println("database is not connect!");

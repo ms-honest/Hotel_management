@@ -13,11 +13,12 @@ public class Hotel {
     //--------------------------------list-----------------------------------------------
     public static List<Manager> managers = new ArrayList<>();
     public static List<Employee> employees = new ArrayList<>();
-    public static Queue<Reserve> reserves = new LinkedList<>();
+    public static List<Reserve> reserves = new ArrayList<>();
     public static List<Passenger> passengers = new ArrayList<>();
     public static List<Room> rooms = new ArrayList<>();
     public static List<hotelBank> bank = new ArrayList<>();
     public static List<Waiting> waitings=new ArrayList<>();
+    public static List<decline> decline=new ArrayList<>();
     //------------------------------------------------------------------------------------
 
     //--------------------------------sign up method--------------------------------------
@@ -660,11 +661,44 @@ public class Hotel {
                             throw new RuntimeException(ex);
                         }
                     }
+                    decline d=new decline(w.getNational(),employee.getNational_code());
+                    decline.add(d);
+                    try {
+                        declinewrite(d);
+                    } catch (SQLException ex) {
+                        throw new RuntimeException(ex);
+                    }
                     JOptionPane.showMessageDialog(f8,"the request declined");
                 }
             }
         });
         f8.setVisible(true);
+    }
+
+    public void declinewrite(decline d) throws SQLException {
+        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3307/hotel",
+                "root", "zahra1382");
+        Statement statement = connection.createStatement();
+        String sqlQuery = "INSERT INTO decline VALUES (?, ?, ?)";
+        PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
+        preparedStatement.setInt(1,d.getDeclineid() );
+        preparedStatement.setString(2,d.getPassengercode());
+        preparedStatement.setString(3, d.getEmployeecode());
+        preparedStatement.executeUpdate();
+    }
+
+    public void declineread() throws SQLException {
+        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3307/hotel",
+                "root", "zahra1382");
+
+        Statement statement = connection.createStatement();
+        ResultSet declineRS = statement.executeQuery("SELECT * FROM decline");
+        while (declineRS.next()) {
+            String passengercode = declineRS.getString("passengercode");
+            String employeecode = declineRS.getString("employeecode");
+            decline d= new decline(passengercode,employeecode);
+            Hotel.decline.add(d);
+        }
     }
 
 //----------------------------------------------waiting-------------------------------------------
